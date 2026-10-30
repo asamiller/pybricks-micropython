@@ -29,7 +29,13 @@
  *
  * Non-atomic updated by the application are allowed.
  */
+// Mach-O has no ELF-style .noinit section; a desktop process has nothing to
+// retain across a reset anyway, so the attribute only matters on ELF targets.
+#ifdef __MACH__
+static uint8_t pbdrv_display_user_frame[PBDRV_CONFIG_DISPLAY_NUM_ROWS][PBDRV_CONFIG_DISPLAY_NUM_COLS] __attribute__((used));
+#else
 static uint8_t pbdrv_display_user_frame[PBDRV_CONFIG_DISPLAY_NUM_ROWS][PBDRV_CONFIG_DISPLAY_NUM_COLS] __attribute__((section(".noinit"), used));
+#endif
 
 /**
  * Image corresponding to the display.

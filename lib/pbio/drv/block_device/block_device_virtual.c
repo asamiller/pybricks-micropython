@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <linux/limits.h>
+#include <limits.h>
 
 #include "../sys/storage_data.h"
 
