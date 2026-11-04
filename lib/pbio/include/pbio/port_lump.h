@@ -18,6 +18,9 @@
 
 typedef struct _pbio_port_lump_dev_t pbio_port_lump_dev_t;
 
+/** The size of a device's INFO type 8 of mode 0, the one size this is known in. */
+#define PBIO_PORT_LUMP_PART_INFO_SIZE (16)
+
 /**
  * Structure containing information about a legodev device mode.
  */
@@ -83,6 +86,8 @@ pbio_error_t pbio_port_lump_get_info(pbio_port_lump_dev_t *lump_dev, uint8_t *nu
 
 pbio_error_t pbio_port_lump_request_reset(pbio_port_lump_dev_t *lump_dev);
 
+pbio_error_t pbio_port_lump_get_part_info(uint8_t device_index, const uint8_t **info, uint8_t *size);
+
 pbio_error_t pbio_port_lump_get_angle(pbio_port_lump_dev_t *lump_dev, pbio_angle_t *angle, bool get_abs_angle);
 
 pbio_error_t pbio_port_lump_get_force(pbio_port_lump_dev_t *lump_dev, int32_t *force, int32_t *distance);
@@ -131,6 +136,10 @@ static inline pbio_error_t pbio_port_lump_get_info(pbio_port_lump_dev_t *lump_de
 }
 
 static inline pbio_error_t pbio_port_lump_request_reset(pbio_port_lump_dev_t *lump_dev) {
+    return PBIO_ERROR_NOT_SUPPORTED;
+}
+
+static inline pbio_error_t pbio_port_lump_get_part_info(uint8_t device_index, const uint8_t **info, uint8_t *size) {
     return PBIO_ERROR_NOT_SUPPORTED;
 }
 

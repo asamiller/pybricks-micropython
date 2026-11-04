@@ -158,6 +158,7 @@ static void pbio_port_lump_reset(pbio_port_lump_dev_t *lump_dev) {
     // Mode info is filled in message by message, so anything not sent by the
     // new device must not be left over from the previous one.
     memset(lump_dev->mode_info, 0, sizeof(lump_dev->mode_info));
+    lump_dev->part_info_size = 0;
     #endif
 }
 
@@ -450,6 +451,14 @@ static void pbio_port_lump_lump_parse_msg(pbio_port_lump_dev_t *lump_dev) {
                     // REVISIT: this is potentially an array of combos
                     debug_pr("mode combos: %04x\n", lump_dev->rx_msg[3] << 8 | lump_dev->rx_msg[2]);
 
+                    break;
+                case LUMP_INFO_UNK8:
+                    // Not a requirement of the sync: a size or mode other
+                    // than the one this is known in is simply not kept.
+                    if (mode == 0 && msg_size == PBIO_PORT_LUMP_PART_INFO_SIZE + 3) {
+                        memcpy(lump_dev->part_info, lump_dev->rx_msg + 2, PBIO_PORT_LUMP_PART_INFO_SIZE);
+                        lump_dev->part_info_size = PBIO_PORT_LUMP_PART_INFO_SIZE;
+                    }
                     break;
                 case LUMP_INFO_UNK9:
                     if (lump_dev->new_mode != mode) {
@@ -1031,6 +1040,33 @@ pbio_error_t pbio_port_lump_set_mode(pbio_port_lump_dev_t *lump_dev, uint8_t mod
     // Request mode switch.
     pbio_port_lump_request_mode(lump_dev, mode);
 
+    return PBIO_SUCCESS;
+}
+
+/**
+ * Gets what a synced device sent as INFO type 8 of mode 0.
+ *
+ * @param [in]  device_index The index of the LUMP device instance.
+ * @param [out] info         The bytes, valid until the next sync.
+ * @param [out] size         Their size, 0 if the device sent none.
+ * @return                   ::PBIO_SUCCESS for a synced device, otherwise
+ *                           ::PBIO_ERROR_AGAIN if no device is synced.
+ */
+pbio_error_t pbio_port_lump_get_part_info(uint8_t device_index, const uint8_t **info, uint8_t *size) {
+    if (device_index >= PBIO_CONFIG_PORT_LUMP_NUM_DEV) {
+        return PBIO_ERROR_INVALID_ARG;
+    }
+    const pbio_port_lump_dev_t *lump_dev = &lump_devices[device_index];
+    if (lump_dev->status != PBIO_PORT_LUMP_STATUS_DATA) {
+        return PBIO_ERROR_AGAIN;
+    }
+    #if PBIO_CONFIG_PORT_LUMP_MODE_INFO
+    *info = lump_dev->part_info;
+    *size = lump_dev->part_info_size;
+    #else
+    *info = NULL;
+    *size = 0;
+    #endif
     return PBIO_SUCCESS;
 }
 

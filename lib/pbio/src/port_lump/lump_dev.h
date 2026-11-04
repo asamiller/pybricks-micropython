@@ -175,6 +175,9 @@ struct _pbio_port_lump_dev_t {
     uint8_t num_modes;
     /**< Information about the current mode. */
     pbio_port_lump_mode_info_t mode_info[(LUMP_MAX_EXT_MODE + 1)];
+    /**< INFO type 8 of mode 0, as the device sent it; its size is 0 until then. */
+    uint8_t part_info[PBIO_PORT_LUMP_PART_INFO_SIZE];
+    uint8_t part_info_size;
     #endif // PBIO_CONFIG_PORT_LUMP_MODE_INFO
 };
 
