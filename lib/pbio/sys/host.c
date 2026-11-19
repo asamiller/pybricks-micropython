@@ -28,12 +28,18 @@ static lwrb_t pbsys_host_stdin_ring_buf;
 static lwrb_t pbsys_host_stdout_ring_buf;
 static bool pbsys_host_event_stdout_busy;
 
+// The hub name a firmware not renamed when flashing reports, which a platform
+// may set in its pbsysconfig.h.
+#ifndef PBSYS_CONFIG_HOST_DEFAULT_HUB_NAME
+#define PBSYS_CONFIG_HOST_DEFAULT_HUB_NAME "Pybricks"
+#endif
+
 // Hub name goes in a special section so that it can be modified when flashing
 // firmware. The attribute syntax is only valid on ELF targets.
 #ifdef __ELF__
 __attribute__((section(".name")))
 #endif
-static char pbsys_host_hub_name[PBSYS_HOST_HUB_NAME_SIZE] = "Pybricks";
+static char pbsys_host_hub_name[PBSYS_HOST_HUB_NAME_SIZE] = PBSYS_CONFIG_HOST_DEFAULT_HUB_NAME;
 
 /**
  * Gets the hub name, reported to hosts where space is limited (BLE
